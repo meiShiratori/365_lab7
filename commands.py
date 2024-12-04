@@ -76,16 +76,16 @@ def reserve_room(conn):
     check_in = input("Check-In Date (YYYY-MM-DD): ")
     check_out = input("Check-Out Date (YYYY-MM-DD): ")
     guest_count = int(input("Number of Children: ")) + int(input("Number of Adult: "))
-    args = [guest_count]
+    args = [check_out, check_in, guest_count]
 
     preferences = """"""
     # Room Code Given
     if room_code != "Any" and room_code != "":
-        args.insert(-1, room_code)
-        preferences = preferences + "AND roomCode=%s"
+        args.append(room_code)
+        preferences = preferences + "AND Room=%s"
     # Bed Type Given
     if bed_type != "Any" and bed_type != "":
-        args.insert(-1, bed_type)
+        args.append(bed_type)
         preferences = preferences + "AND bedType=%s"
 
 
@@ -103,8 +103,8 @@ def reserve_room(conn):
                 hpena02.lab7_reservations AS res
             WHERE
                 NOT (
-                    CheckOut <= '2023-10-15' OR
-                    CheckIn >= '2023-10-17'
+                    CheckOut <= %s OR
+                    CheckIn >= %s
                 )
         )
         SELECT 
@@ -120,16 +120,13 @@ def reserve_room(conn):
     """
    
     cursor = conn.cursor()
+    print(args)
     cursor.execute(sql_query, args)
     result = cursor.fetchall()
     columns = [desc[0] for desc in cursor.description]
    
     df = pd.DataFrame(result, columns=columns)
 
-    # Display the DataFrame
     print(df)
 
-    
-
-    #print(df)
 

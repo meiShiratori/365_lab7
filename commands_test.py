@@ -16,8 +16,15 @@ def test_fr1():
     list_rooms(conn)
 
 def test_fr2():
+    # Any RoomCode
+    # Queen
+    # 1 Kid
+    # 1 adult
+    #CHECKIN: 2023-10-15
+    #CHECKOUT: 2023-10-17
     reserve_room(conn)
 
 if __name__ == "__main__":    
+    
     test_fr2()
     
