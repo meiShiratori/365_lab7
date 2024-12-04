@@ -1,12 +1,14 @@
 
-import importlib  
+
 import mysql.connector
 from commands import *
 import pandas as pd
 
-conn = mysql.connector.connect(user="hpena02", password="365-fall24-028577009",
+sql_user = "hpena02"
+sql_password = "password"
+conn = mysql.connector.connect(user=sql_user, password=sql_password,
                             host='mysql.labthreesixfive.com',
-                            database='hpena02')
+                            database=sql_user)
 cursor = conn.cursor()
 
 
