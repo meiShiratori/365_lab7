@@ -70,4 +70,66 @@ def list_rooms(conn):
     # result = cursor.fetchall()
     # return result
 
+def reserve_room(conn):
+    room_code = input("Room Code (Enter or \"Any\" for no preference): ")
+    bed_type = input("Bed Type (Enter or \"Any\" for no preference): ")
+    check_in = input("Check-In Date (YYYY-MM-DD): ")
+    check_out = input("Check-Out Date (YYYY-MM-DD): ")
+    guest_count = int(input("Number of Children: ")) + int(input("Number of Adult: "))
+    args = [guest_count]
+
+    preferences = """"""
+    # Room Code Given
+    if room_code != "Any" and room_code != "":
+        args.insert(-1, room_code)
+        preferences = preferences + "AND roomCode=%s"
+    # Bed Type Given
+    if bed_type != "Any" and bed_type != "":
+        args.insert(-1, bed_type)
+        preferences = preferences + "AND bedType=%s"
+
+
+
+    sql_query = f"""
+        WITH available_rooms AS (
+            SELECT
+                Room
+            FROM 
+                hpena02.lab7_reservations AS res
+            EXCEPT
+            SELECT 
+                Room
+            FROM 
+                hpena02.lab7_reservations AS res
+            WHERE
+                NOT (
+                    CheckOut <= '2023-10-15' OR
+                    CheckIn >= '2023-10-17'
+                )
+        )
+        SELECT 
+            RoomCode, RoomName, Beds, bedType, maxOcc, basePrice, decor
+        FROM 
+            available_rooms ar
+        JOIN
+            hpena02.lab7_rooms AS r
+        ON
+            ar.Room = r.RoomCode
+        WHERE
+            maxOcc>=%s {preferences}
+    """
+   
+    cursor = conn.cursor()
+    cursor.execute(sql_query, args)
+    result = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+   
+    df = pd.DataFrame(result, columns=columns)
+
+    # Display the DataFrame
+    print(df)
+
+    
+
+    #print(df)
 
