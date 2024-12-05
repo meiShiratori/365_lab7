@@ -85,17 +85,27 @@ def search(conn):
     room_code = input("Enter room code:\n:> ").strip()
 
     sql_query = f"""
-    SELECT *
-    FROM lab7_reservations
+    SELECT 
+        res.*,
+        rooms.RoomName,
+        rooms.Beds,
+        rooms.bedType,
+        rooms.maxOcc,
+        rooms.basePrice,
+        rooms.decor
+    FROM 
+        hpena02.lab7_reservations res
+    JOIN 
+        hpena02.lab7_rooms rooms ON res.Room = rooms.RoomCode
     WHERE
-      ('{first_name}' = '' OR FirstName LIKE '%{first_name}%')
-      AND ('{last_name}' = '' OR LastName LIKE '%{last_name}%')
-      AND (
-          ('{checkin}' = '' AND '{checkout}' = '')
-          OR (CheckIn BETWEEN '{checkin}' AND '{checkout}')
-      )
-      AND ('{room_code}' = '' OR Room LIKE '%{room_code}%')
-      AND ('{reservation_code}' = '' OR CODE = '{reservation_code}');
+        ('{first_name}' = '' OR res.FirstName LIKE '%{first_name}%')
+        AND ('{last_name}' = '' OR res.LastName LIKE '%{last_name}%')
+        AND (
+            ('{checkin}' = '' AND '{checkout}' = '')
+            OR (res.CheckIn BETWEEN '{checkin}' AND '{checkout}')
+        )
+        AND ('{room_code}' = '' OR res.Room LIKE '%{room_code}%')
+        AND ('{reservation_code}' = '' OR res.CODE = '{reservation_code}');
     """
 
 
