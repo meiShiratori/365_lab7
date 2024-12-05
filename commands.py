@@ -74,11 +74,11 @@ def list_rooms(conn):
 def get_revenue(conn):
     sql_query = """
         WITH RECURSIVE date_range AS (
-            SELECT '2024-01-01' AS dt
+            SELECT DATE_FORMAT(CURDATE(), '%Y-01-01') AS dt
             UNION ALL
             SELECT DATE_ADD(dt, INTERVAL 1 DAY)
             FROM date_range
-            WHERE dt < '2024-12-31'
+            WHERE dt < DATE_FORMAT(CURDATE(), '%Y-12-31')
         ),
         daily_revenue AS (
             SELECT
@@ -89,9 +89,11 @@ def get_revenue(conn):
             FROM
                 date_range d
             JOIN
-                hpena02.lab7_reservations rsv ON d.dt >= rsv.CheckIn AND d.dt < rsv.CheckOut
+                hpena02.lab7_reservations rsv 
+                ON d.dt >= rsv.CheckIn AND d.dt < rsv.CheckOut
             JOIN
-                hpena02.lab7_rooms r ON r.RoomCode = rsv.Room
+                hpena02.lab7_rooms r 
+                ON r.RoomCode = rsv.Room
         ),
         monthly_revenue AS (
             SELECT
@@ -107,24 +109,23 @@ def get_revenue(conn):
         SELECT
             RoomCode,
             RoomName,
-            SUM(CASE WHEN month = '2024-01' THEN monthly_total ELSE 0 END) AS Jan,
-            SUM(CASE WHEN month = '2024-02' THEN monthly_total ELSE 0 END) AS Feb,
-            SUM(CASE WHEN month = '2024-03' THEN monthly_total ELSE 0 END) AS Mar,
-            SUM(CASE WHEN month = '2024-04' THEN monthly_total ELSE 0 END) AS Apr,
-            SUM(CASE WHEN month = '2024-05' THEN monthly_total ELSE 0 END) AS May,
-            SUM(CASE WHEN month = '2024-06' THEN monthly_total ELSE 0 END) AS Jun,
-            SUM(CASE WHEN month = '2024-07' THEN monthly_total ELSE 0 END) AS Jul,
-            SUM(CASE WHEN month = '2024-08' THEN monthly_total ELSE 0 END) AS Aug,
-            SUM(CASE WHEN month = '2024-09' THEN monthly_total ELSE 0 END) AS Sep,
-            SUM(CASE WHEN month = '2024-10' THEN monthly_total ELSE 0 END) AS Oct,
-            SUM(CASE WHEN month = '2024-11' THEN monthly_total ELSE 0 END) AS Nov,
-            SUM(CASE WHEN month = '2024-12' THEN monthly_total ELSE 0 END) AS Dec,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-01') THEN monthly_total ELSE 0 END) AS Jan,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-02') THEN monthly_total ELSE 0 END) AS Feb,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-03') THEN monthly_total ELSE 0 END) AS Mar,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-04') THEN monthly_total ELSE 0 END) AS Apr,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-05') THEN monthly_total ELSE 0 END) AS May,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-06') THEN monthly_total ELSE 0 END) AS Jun,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-07') THEN monthly_total ELSE 0 END) AS Jul,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-08') THEN monthly_total ELSE 0 END) AS Aug,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-09') THEN monthly_total ELSE 0 END) AS Sep,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-10') THEN monthly_total ELSE 0 END) AS Oct,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-11') THEN monthly_total ELSE 0 END) AS Nov,
+            SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-12') THEN monthly_total ELSE 0 END) AS `Dec`,
             SUM(monthly_total) AS Total
         FROM
             monthly_revenue
         GROUP BY
-            RoomCode, RoomName
-        WITH ROLLUP;
+            RoomCode, RoomName;
     """
 
     df = pd.read_sql(sql_query, conn)
