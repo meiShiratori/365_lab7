@@ -35,6 +35,7 @@ def main():
         # FR4
         if command.upper() == "S" or command == "Search": 
             print("Search")
+            get_revenue(conn)
 
         # FR5
         if command.upper() == "R" or command == "Revenue": 
