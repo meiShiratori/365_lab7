@@ -1,5 +1,9 @@
 import pandas as pd
 from datetime import datetime, timedelta
+import mysql.connector
+
+from commands_test import cursor
+
 
 def list_rooms(conn):
     sql_query = """
@@ -334,4 +338,14 @@ def get_revenue(conn):
 
     df = pd.read_sql(sql_query, conn)
     print(df)
+
+def new_connection(user_name, password):
+    conn = mysql.connector.connect(user=user_name, password=password,
+                                   host='mysql.labthreesixfive.com',
+                                   database=user_name)
+    if conn.is_connected():
+        return conn
+    else:
+        print("Could not establish connection to MySQL database")
+        return None
 
