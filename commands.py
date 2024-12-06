@@ -185,7 +185,6 @@ def calculate_total_cost(check_in, check_out, base_rate):
     weekend_cost = weekends * (base_rate * 1.1)
     return round(weekday_cost + weekend_cost, 2)
 
-=======
 def search(conn):
     first_name = input("Enter first name:\n:> ").strip()
     last_name = input("Enter last name :\n:> ").strip()
