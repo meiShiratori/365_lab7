@@ -126,10 +126,6 @@ def search(conn):
     conn.commit()
     print(result)
 
-
-    result = pd.read_sql(sql_query, conn)
-    print(result)
-
 def get_revenue(conn):
     sql_query = """
         WITH RECURSIVE date_range AS (
