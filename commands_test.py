@@ -24,7 +24,17 @@ def test_fr2():
     #CHECKOUT: 2023-10-17
     reserve_room(conn)
 
+def test_fr3():
+    # Any RoomCode
+    # Queen
+    # 1 Kid
+    # 1 adult
+    #CHECKIN: 2023-10-15
+    #CHECKOUT: 2023-10-17
+    cancel_reservation(conn)
+
 if __name__ == "__main__":    
-    
-    test_fr2()
+    #print(calculate_total_cost("2026-06-27", "2026-06-28", float(Decimal('175.00'))))
+    test_fr3()
+    #test_fr2()
     
