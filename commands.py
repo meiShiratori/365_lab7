@@ -69,19 +69,37 @@ def list_rooms(conn):
 
     print(df)
 
-    # cursor.execute("SELECT * FRoM hpena02.lab7_rooms")
-    # result = cursor.fetchall()
-    # return result
-
-def reserve_room(conn):
-    first_name = input("First Name: ")
-    last_name = input("Last Name: ")
+def validate_date(date_str):
+    try:
+        return datetime.strptime(date_str, "%Y-%m-%d")
+    except ValueError:
+        return None
+        
+def reserve_input():
+    first_name, last_name, room_code, bed_type, check_in, check_out, adults, kids = "","","","","","","",""
+    
+    while first_name == "":
+        first_name = input("First Name: ").upper().strip()
+    while last_name == "":
+        last_name = input("Last Name: ").upper().strip()
     room_code = input("Room Code (Enter or \"Any\" for no preference): ")
     bed_type = input("Bed Type (Enter or \"Any\" for no preference): ")
-    check_in = input("Check-In Date (YYYY-MM-DD): ")
-    check_out = input("Check-Out Date (YYYY-MM-DD): ")
-    adults = int(input("Number of Adult: "))
-    kids = int(input("Number of Children: "))
+
+    while validate_date(check_in.strip()) is None:
+        check_in = input("Check-In Date (YYYY-MM-DD): ")
+    while validate_date(check_out.strip()) is None or check_in == check_out:
+        check_out = input("Check-Out Date (YYYY-MM-DD): ")
+
+    while not adults.isnumeric():
+        adults = input("Number of Adult: ")
+    while not kids.isnumeric():
+        kids = input("Number of Children: ")
+
+    return first_name, last_name, room_code, bed_type, check_in, check_out, int(adults), int(kids)
+
+def reserve_room(conn):
+    first_name, last_name, room_code, bed_type, check_in, check_out, adults, kids = reserve_input()
+
     guest_count = kids + adults
     args = [check_out, check_in, guest_count]
 
@@ -95,7 +113,14 @@ def reserve_room(conn):
         args.append(bed_type)
         preferences = preferences + "AND bedType=%s"
 
-    sql_query = f"""
+    cursor = conn.cursor()
+    cursor.execute("""SELECT * FROM hpena02.lab7_rooms WHERE maxOcc >= %s""", [guest_count])
+    result = cursor.fetchall()
+    if len(result) == 0:
+        print("No suitable rooms available.")
+        return
+    
+    base_query = f"""
         WITH available_rooms AS (
             SELECT
                 Room
@@ -121,12 +146,21 @@ def reserve_room(conn):
         ON
             ar.Room = r.RoomCode
         WHERE
-            maxOcc>=%s {preferences}
-    """
-   
+            maxOcc>=%s """
+    final_query = base_query + preferences
     cursor = conn.cursor()
-    cursor.execute(sql_query, args)
+    cursor.execute(final_query, args)
     result = cursor.fetchall()
+
+    ## If there are no valid results
+    if len(result) == 0:
+        print("\nCould not find rooms with preferred Room Code and/or Bed Type. \nHere are other rooms for the same dates: ")
+        final_query = base_query
+        args = [check_out, check_in, guest_count]
+        cursor = conn.cursor()
+        cursor.execute(final_query, args)
+        result = cursor.fetchall()[:5]
+
     columns = [desc[0] for desc in cursor.description]
     df = pd.DataFrame(result, columns=columns)
     print("\n<----- Available Rooms ----->")
@@ -185,7 +219,6 @@ def calculate_total_cost(check_in, check_out, base_rate):
     weekend_cost = weekends * (base_rate * 1.1)
     return round(weekday_cost + weekend_cost, 2)
 
-=======
 def search(conn):
     first_name = input("Enter first name:\n:> ").strip()
     last_name = input("Enter last name :\n:> ").strip()
