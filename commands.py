@@ -214,18 +214,32 @@ def search(conn):
     JOIN 
         hpena02.lab7_rooms rooms ON res.Room = rooms.RoomCode
     WHERE
-        ('{first_name}' = '' OR res.FirstName LIKE '%{first_name}%')
-        AND ('{last_name}' = '' OR res.LastName LIKE '%{last_name}%')
+        (%s = '' OR res.FirstName LIKE %s)
+        AND (%s = '' OR res.LastName LIKE %s)
         AND (
-            ('{checkin}' = '' AND '{checkout}' = '')
-            OR (res.CheckIn BETWEEN '{checkin}' AND '{checkout}')
+            (%s = '' AND %s = '')
+            OR (res.CheckIn BETWEEN %s AND %s)
         )
-        AND ('{room_code}' = '' OR res.Room LIKE '%{room_code}%')
-        AND ('{reservation_code}' = '' OR res.CODE = '{reservation_code}');
+        AND (%s = '' OR res.Room LIKE %s)
+        AND (%s = '' OR res.CODE = %s);
     """
 
+    cursor = conn.cursor()
+    first_name_wildcard = f"%{first_name}%" if first_name else ""
+    last_name_wildcard = f"%{last_name}%" if last_name else ""
+    room_code_wildcard = f"%{room_code}%" if room_code else ""
 
-    result = pd.read_sql(sql_query, conn)
+    insert_args = [
+        first_name, first_name_wildcard,
+        last_name, last_name_wildcard,
+        checkin, checkout, checkin, checkout,
+        room_code, room_code_wildcard,
+        reservation_code, reservation_code
+    ]
+    cursor.execute(sql_query, insert_args)
+    result = cursor.fetchall()
+    result = pd.DataFrame(result, columns=[desc[0] for desc in cursor.description])
+    conn.commit()
     print(result)
 
 def get_revenue(conn):
