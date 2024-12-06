@@ -40,6 +40,7 @@ def main():
         # FR5
         if command.upper() == "R" or command == "Revenue": 
             print("Revenue")
+            get_revenue(conn)
 
         # Exit
         if command.upper() == "E":
