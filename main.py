@@ -8,36 +8,39 @@ def main():
 
     db_user = input("Enter Database User: ")
     db_password = getpass.getpass()
-    conn = mysql.connector.connect(user=db_user, password=db_password,
-                                host='mysql.labthreesixfive.com',
-                                database=db_user)
-
-    cursor = conn.cursor()
-    if cursor:
-        print("Connection established.")
-    print("Welcome to the Inn Management System.")
 
     while(True):
         command = input(":> ")
         # FR1
-        if command.upper() == "L" or command == "List": 
+        if command.upper() == "L" or command == "List":
+            conn = new_connection(db_user, db_password)
             list_rooms(conn)
+            conn.close()
 
         # FR2
-        if command.upper() == "B" or command == "Book": 
+        if command.upper() == "B" or command == "Book":
+            conn = new_connection(db_user, db_password)
             reserve_room(conn)
+            conn.close()
 
         # FR3
-        if command.upper() == "C" or command == "Cancel": 
+        if command.upper() == "C" or command == "Cancel":
+            conn = new_connection(db_user, db_password)
             cancel_reservation(conn)
+            conn.close()
+
 
         # FR4
-        if command.upper() == "S" or command == "Search": 
+        if command.upper() == "S" or command == "Search":
+            conn = new_connection(db_user, db_password)
             search(conn)
+            conn.close()
 
         # FR5
-        if command.upper() == "R" or command == "Revenue": 
+        if command.upper() == "R" or command == "Revenue":
+            conn = new_connection(db_user, db_password)
             get_revenue(conn)
+            conn.close()
 
         # Exit
         if command.upper() == "E":
