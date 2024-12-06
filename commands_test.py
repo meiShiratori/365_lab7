@@ -34,7 +34,5 @@ def test_fr3():
     cancel_reservation(conn)
 
 if __name__ == "__main__":    
-    #print(calculate_total_cost("2026-06-27", "2026-06-28", float(Decimal('175.00'))))
-    test_fr3()
-    #test_fr2()
+    print(validate_date("204-12-02"))
     
