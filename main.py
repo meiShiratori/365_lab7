@@ -21,16 +21,15 @@ def main():
         command = input(":> ")
         # FR1
         if command.upper() == "L" or command == "List": 
-            print("List")
             list_rooms(conn)
 
         # FR2
         if command.upper() == "B" or command == "Book": 
-            print("Book")
+            reserve_room(conn)
 
         # FR3
         if command.upper() == "C" or command == "Cancel": 
-            print("Cancel")
+            cancel_reservation(conn)
 
         # FR4
         if command.upper() == "S" or command == "Search": 

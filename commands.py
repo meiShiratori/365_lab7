@@ -32,7 +32,7 @@ def list_rooms(conn):
             JOIN 
                 hpena02.lab7_reservations ON RoomCode = Room 
             WHERE 
-                Checkin < CURDATE()
+                Checkin <= CURDATE()
             GROUP BY 
                 RoomCode
         ), completed_stay AS (   
