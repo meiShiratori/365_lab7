@@ -1,0 +1,271 @@
+commit 96340090d3bb0f51c3514f1914d4f1a86f878b20
+Merge: 1d62c97 67fb64b
+Author: Mei Shiratori <102556717+meiShiratori@users.noreply.github.com>
+Date:   Fri Dec 6 16:09:49 2024 -0800
+
+    Merge pull request #7 from meiShiratori/cleanup
+    
+    added comments and light cleanup of code
+
+commit 67fb64b7ba57f603ee1850f64b425f89302e5695
+Merge: fe25f3f 1d62c97
+Author: Mei Shiratori <102556717+meiShiratori@users.noreply.github.com>
+Date:   Fri Dec 6 16:09:37 2024 -0800
+
+    Merge branch 'main' into cleanup
+
+commit fe25f3f74f266e3871af354a2a58b9d3c7eb25bc
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Fri Dec 6 16:07:05 2024 -0800
+
+    added comments and light cleanup of code
+
+ commands.py | 63 ++++++++++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 48 insertions(+), 15 deletions(-)
+
+commit 1d62c9784a32227089495a22974df5462b319803
+Merge: c3a19fb b84af43
+Author: Mei Shiratori <102556717+meiShiratori@users.noreply.github.com>
+Date:   Fri Dec 6 15:37:12 2024 -0800
+
+    Merge pull request #6 from meiShiratori/conn_function
+    
+    Changed code to establish a new connection for every query, updated r…
+
+commit b84af435c2a3f02897a8c89b019906478abffacb
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Fri Dec 6 15:35:03 2024 -0800
+
+    Changed code to establish a new connection for every query, updated readme with group names
+
+ README      |  9 +++++++++
+ commands.py | 14 ++++++++++++++
+ main.py     | 29 ++++++++++++++++-------------
+ 3 files changed, 39 insertions(+), 13 deletions(-)
+
+commit c3a19fb2d85658d3cbb524e63e50f688b5833495
+Merge: c82f93b d88e028
+Author: Hahns Pena <113945762+hahnspena102@users.noreply.github.com>
+Date:   Fri Dec 6 13:10:09 2024 -0800
+
+    Merge pull request #5 from meiShiratori/FR2more
+    
+    FR2 other requirements, should be working
+
+commit d88e0282459f70dd5a905689f18a189738bb31ef
+Author: hahns_pena <hpena02@calpoly.edu>
+Date:   Fri Dec 6 13:09:48 2024 -0800
+
+    FR2 other requirements, should be working
+
+ __pycache__/commands.cpython-310.pyc | Bin 5731 -> 10661 bytes
+ commands.py                          |  67 ++++++++++++++++++++++++++---------
+ commands_test.py                     |   4 +--
+ main.py                              |   2 --
+ 4 files changed, 51 insertions(+), 22 deletions(-)
+
+commit c82f93b61da8bca393f5d282291a66af2f01ea1e
+Author: Mei Shiratori <102556717+meiShiratori@users.noreply.github.com>
+Date:   Fri Dec 6 13:08:14 2024 -0800
+
+    removed '======' from commands.py
+
+ commands.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit b9d9368673d890b36e38675c4ce689dfd031682e
+Merge: e3b0e28 e934e12
+Author: Mei Shiratori <102556717+meiShiratori@users.noreply.github.com>
+Date:   Fri Dec 6 13:01:02 2024 -0800
+
+    Merge pull request #4 from meiShiratori/FR4
+    
+    Fr4
+
+commit e934e1277dc30ca98c4285c5330c7c5613eb1074
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Fri Dec 6 12:59:49 2024 -0800
+
+    Fr4 sql injection vulnerability fixed
+
+ commands.py | 4 ----
+ 1 file changed, 4 deletions(-)
+
+commit 4e419ab57cc2fa3393c8fcb951f92febd0c1811a
+Merge: bcc68ec 30594bb
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Fri Dec 6 12:58:52 2024 -0800
+
+    Merge remote-tracking branch 'origin/FR4' into FR4
+
+commit bcc68ecb4d979fc9be739345ea144d309dd1760a
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Fri Dec 6 12:58:33 2024 -0800
+
+    Fr4 sql injection vulnerability fixed
+
+ commands.py | 30 ++++++++++++++++++++++++------
+ 1 file changed, 24 insertions(+), 6 deletions(-)
+
+commit e3b0e283a1c37e831713cddce8126698ee446377
+Merge: 9f325f9 e494d87
+Author: Hahns Pena <113945762+hahnspena102@users.noreply.github.com>
+Date:   Fri Dec 6 12:23:37 2024 -0800
+
+    Merge pull request #3 from meiShiratori/fr2
+    
+    Fr2
+
+commit e494d873e82d74658e2c2a430c2e5aabcd6def3d
+Merge: 7ec0ed4 9f325f9
+Author: Hahns Pena <113945762+hahnspena102@users.noreply.github.com>
+Date:   Fri Dec 6 12:23:29 2024 -0800
+
+    Merge branch 'main' into fr2
+
+commit 9f325f907a22c12efab10ba840112761fd344678
+Merge: e47dc95 30594bb
+Author: Mei Shiratori <102556717+meiShiratori@users.noreply.github.com>
+Date:   Fri Dec 6 12:22:21 2024 -0800
+
+    Merge pull request #2 from meiShiratori/FR4
+    
+    Fr4
+
+commit 30594bb6671508b6bd566dd08a8d752bc7600988
+Merge: 5383918 e47dc95
+Author: Mei Shiratori <102556717+meiShiratori@users.noreply.github.com>
+Date:   Fri Dec 6 12:22:13 2024 -0800
+
+    Merge branch 'main' into FR4
+
+commit 7ec0ed44c3b0f67c3adae212eab692a0b96b56cd
+Author: hahns_pena <hpena02@calpoly.edu>
+Date:   Fri Dec 6 12:16:40 2024 -0800
+
+    FR2, FR3 finished w/ some fixes necessary
+
+ __pycache__/commands.cpython-310.pyc | Bin 5678 -> 5731 bytes
+ commands.py                          |   2 +-
+ main.py                              |   5 ++---
+ 3 files changed, 3 insertions(+), 4 deletions(-)
+
+commit e47dc9535c90de91411a4890ecb33bc1a025d896
+Merge: 4729ac8 c677ec9
+Author: Mei Shiratori <102556717+meiShiratori@users.noreply.github.com>
+Date:   Fri Dec 6 12:16:07 2024 -0800
+
+    Merge pull request #1 from meiShiratori/FR5
+    
+    Fr5
+
+commit c677ec9a2ea84522ab37f32a0e7377e2fd2c85d2
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Fri Dec 6 12:14:04 2024 -0800
+
+    had to call get_revenue in main
+
+ main.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit e0ae18914ad25a3d979c20fbf5c9fdc650d4d31b
+Author: hahns_pena <hpena02@calpoly.edu>
+Date:   Fri Dec 6 10:17:13 2024 -0800
+
+    FR2 and FR3, almost done
+
+ __pycache__/commands.cpython-310.pyc | Bin 4070 -> 5678 bytes
+ commands.py                          |  68 +++++++++++++++++++++++++++++++----
+ commands_test.py                     |  14 ++++++--
+ 3 files changed, 74 insertions(+), 8 deletions(-)
+
+commit 53839187e3235a144158faf561a5356ef30b7829
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Thu Dec 5 14:00:05 2024 -0800
+
+    FR4 untested - modifications made to fit functional requirement and fix a few errors
+
+ commands.py | 30 ++++++++++++++++++++----------
+ main.py     |  1 +
+ 2 files changed, 21 insertions(+), 10 deletions(-)
+
+commit ebbe48ff3df6ee3a61eb39bf4c210c52018583d5
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Thu Dec 5 13:47:17 2024 -0800
+
+    FR5 untested - modified
+
+ commands.py | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
+
+commit 0bd23986afee3297e878e98b8ce36282c6e4169e
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Thu Dec 5 13:41:00 2024 -0800
+
+    FR5 untested
+
+ commands.py | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ main.py     |  1 +
+ 2 files changed, 59 insertions(+)
+
+commit 2da7b8f4f36531c71611beeb88d91cd0389bdf16
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Thu Dec 5 13:06:16 2024 -0800
+
+    FR4 untested
+
+ commands.py | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
+
+commit fc8c7738e4ab8c245c4a828d2ad684138064ab74
+Author: hahns_pena <hpena02@calpoly.edu>
+Date:   Wed Dec 4 13:51:56 2024 -0800
+
+    FR2 mostly done (no input val)
+
+ __pycache__/commands.cpython-310.pyc | Bin 4083 -> 4070 bytes
+ commands.py                          |  17 +++++++----------
+ commands_test.py                     |   7 +++++++
+ 3 files changed, 14 insertions(+), 10 deletions(-)
+
+commit 36550e832754ace3970c98350cbb9db3ebd36551
+Author: hahns_pena <hpena02@calpoly.edu>
+Date:   Wed Dec 4 13:41:56 2024 -0800
+
+    FR2 frame
+
+ __pycache__/commands.cpython-310.pyc | Bin 2439 -> 4083 bytes
+ commands.py                          |  62 +++++++++++++++++++++++++++++++++++
+ commands_test.py                     |   8 +++--
+ 3 files changed, 68 insertions(+), 2 deletions(-)
+
+commit 4729ac83d33f5a59e07f2760b5ec8e9023a7e1ae
+Author: hahns_pena <hpena02@calpoly.edu>
+Date:   Wed Dec 4 12:13:36 2024 -0800
+
+    FR1 fix 1
+
+ commands_test.py | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+commit cb00c0d4107ad040509a1a9a92ca61353aa82809
+Author: hahns_pena <hpena02@calpoly.edu>
+Date:   Tue Dec 3 23:15:55 2024 -0800
+
+    FR1 working
+
+ __pycache__/commands.cpython-310.pyc | Bin 0 -> 2439 bytes
+ commands.py                          |  73 +++++++++++++++++++++++++++++++++++
+ commands_test.py                     |  17 ++++++++
+ main.py                              |  48 +++++++++++++++++++++++
+ 4 files changed, 138 insertions(+)
+
+commit 4e89488aab4593b15f176eb5a4c4091489d99477
+Author: 7meiSh <7mei.sh@gmail.com>
+Date:   Mon Dec 2 16:03:53 2024 -0800
+
+    Initial commit
+
+ README  | 0
+ main.py | 0
+ 2 files changed, 0 insertions(+), 0 deletions(-)

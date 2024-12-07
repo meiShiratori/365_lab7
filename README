@@ -3,7 +3,15 @@ Group Members:
     Mei Shiratori
 
  Runtime Instructions:
-    run from terminal using python
+    Run from terminal using Python
+        python3 main.py
+    Commands
+        [L]ist - List rooms
+        [B]ook - Book a reservation
+        [C]ancel - Cancel a reservation
+        [S]earch - Search for a reservation
+        [R]evenue - Display revenue
+        [E]xit - Exits the program
 
 Known issues:
     none

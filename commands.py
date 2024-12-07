@@ -1,10 +1,25 @@
 import pandas as pd
 from datetime import datetime, timedelta
 import mysql.connector
-from commands_test import cursor
 
+def new_connection(user_name, password):
+    """
+    establishes a connection to the mysql database using the pre-specified username and password
+    or prints a warning if the connection could not be established
+    """
+
+    conn = mysql.connector.connect(user=user_name, password=password,
+                                   host='mysql.labthreesixfive.com',
+                                   database=user_name)
+    if conn.is_connected():
+        return conn
+    else:
+        print("Could not establish connection to MySQL database")
+        return None
 
 def list_rooms(conn):
+    """Lists all rooms with room information, popularity score, 
+    next avaialable check in, and latest reservation length."""
     sql_query = """
         WITH popularity AS (
             SELECT 
@@ -73,12 +88,14 @@ def list_rooms(conn):
     print(df)
 
 def validate_date(date_str):
+    """Validates a string of YYYY-MM-DD"""
     try:
         return datetime.strptime(date_str, "%Y-%m-%d")
     except ValueError:
         return None
 
 def reserve_input():
+    """Returns the inputs necessary for a room reservation"""
     first_name, last_name, room_code, bed_type, check_in, check_out, adults, kids = "","","","","","","",""
 
     while first_name == "":
@@ -101,6 +118,8 @@ def reserve_input():
     return first_name, last_name, room_code, bed_type, check_in, check_out, int(adults), int(kids)
 
 def reserve_room(conn):
+    """Creates a reservation for a room."""
+    # Get input
     first_name, last_name, room_code, bed_type, check_in, check_out, adults, kids = reserve_input()
 
     guest_count = kids + adults
@@ -116,6 +135,7 @@ def reserve_room(conn):
         args.append(bed_type)
         preferences = preferences + "AND bedType=%s"
 
+    # Check to see if any room can accomodate guest count
     cursor = conn.cursor()
     cursor.execute("""SELECT * FROM hpena02.lab7_rooms WHERE maxOcc >= %s""", [guest_count])
     result = cursor.fetchall()
@@ -150,46 +170,67 @@ def reserve_room(conn):
             ar.Room = r.RoomCode
         WHERE
             maxOcc>=%s """
+    
+    # Search for rooms available with given preference.
     final_query = base_query + preferences
     cursor = conn.cursor()
     cursor.execute(final_query, args)
     result = cursor.fetchall()
 
-    ## If there are no valid results
+    ## If there are no valid results, search without room code or bed preference.
     if len(result) == 0:
-        print("\nCould not find rooms with preferred Room Code and/or Bed Type. \nHere are other rooms for the same dates: ")
+        
         final_query = base_query
         args = [check_out, check_in, guest_count]
         cursor = conn.cursor()
         cursor.execute(final_query, args)
         result = cursor.fetchall()[:5]
+        if len(result) == 0:
+            print("No suitable rooms available.")
+            return
+        print("\nCould not find rooms with preferred Room Code and/or Bed Type. \nHere are other rooms for the same dates: ")
 
     columns = [desc[0] for desc in cursor.description]
     df = pd.DataFrame(result, columns=columns)
+
     print("\n<----- Available Rooms ----->")
     print(df)
 
     print("\n")
-    selected_index = input(f"Select a room from 0-{len(result)-1} or [C]ancel: ")
-    if selected_index == "C" or selected_index == "Cancel":
-        return
-    selected_room = result[ int(selected_index)]
+    
+    # Ask user for which room they want
+    selected_index = -1
+    while True:
+        selected_index = input(f"Select a room from 0-{len(result)-1} or [C]ancel: ")
+        if selected_index.upper() == "C" or selected_index == "Cancel":
+            return
+        if selected_index.isnumeric() and int(selected_index) >= 0 and int(selected_index) < (len(result)):
+            break
 
-    #print(selected_room)
+    selected_room = result[int(selected_index)]
 
+    # Find next ID available
+    id_query = """
+        SELECT MAX(CODE) FROM hpena02.lab7_reservations
+    """
+    cursor.execute(id_query)
+    next_code = int(cursor.fetchall()[0][0]) + 1
+
+    # Insert into table
     insert_query = """
         INSERT INTO 
             hpena02.lab7_reservations (CODE, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) 
         VALUES 
-            (UUID(), %s, %s, %s, %s, %s, %s, %s, %s)
+            (%s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
 
-    insert_args = [selected_room[0], check_in, check_out, calculate_total_cost(check_in, check_out, float(selected_room[5])), last_name, first_name, adults, kids]
+    insert_args = [next_code, selected_room[0], check_in, check_out, calculate_total_cost(check_in, check_out, float(selected_room[5])), last_name, first_name, adults, kids]
     print(insert_args)
     cursor.execute(insert_query, insert_args)
     conn.commit()
 
 def cancel_reservation(conn):
+    """Cancels a reservation given a room code"""
     cursor = conn.cursor()
     del_query = """
         DELETE FROM hpena02.lab7_reservations
@@ -204,6 +245,7 @@ def cancel_reservation(conn):
     print("Reservation successfully cancelled.")
 
 def calculate_total_cost(check_in, check_out, base_rate):
+    """Calculate the total cost of a stay."""
     check_in_date = datetime.strptime(check_in, "%Y-%m-%d")
     check_out_date = datetime.strptime(check_out, "%Y-%m-%d")
     total_days = (check_out_date - check_in_date).days
@@ -228,18 +270,18 @@ def search(conn):
     Returns reservation information containing room name, bed type, number of beds, room size, base price, and room decoration
     """
     # Collect user input for search criteria
-    first_name = input("Enter first name:\n:> ").strip()
-    last_name = input("Enter last name:\n:> ").strip()
-    checkin = input("Enter check-in date (YYYY-MM-DD):\n:> ").strip()
+    first_name = input("Enter first name: ").strip()
+    last_name = input("Enter last name: ").strip()
+    checkin = input("Enter check-in date (YYYY-MM-DD): ").strip()
     while not checkin:
         print("Check-in cannot be blank\n")
-        checkin = input("Enter check-in date (YYYY-MM-DD):\n:> ").strip()
-    checkout = input("Enter check-out date (YYYY-MM-DD):\n:> ").strip()
+        checkin = input("Enter check-in date (YYYY-MM-DD):\ ").strip()
+    checkout = input("Enter check-out date (YYYY-MM-DD): ").strip()
     while not checkout:
         print("Check-out cannot be blank\n")
-        checkout = input("Enter check-out date (YYYY-MM-DD):\n:> ").strip()
-    reservation_code = input("Enter reservation code:\n:> ").strip()
-    room_code = input("Enter room code:\n:> ").strip()
+        checkout = input("Enter check-out date (YYYY-MM-DD): ").strip()
+    reservation_code = input("Enter reservation code: ").strip()
+    room_code = input("Enter room code: ").strip()
 
     # Query with parameters for filtering
     sql_query = f"""
@@ -317,7 +359,7 @@ def get_revenue(conn):
                 hpena02.lab7_rooms r 
                 ON r.RoomCode = rsv.Room
         ),
-        monthly_revenue AS ( -- Summarise revenue by room and month
+        monthly_revenue AS ( 
             SELECT
                 RoomCode,
                 RoomName,
@@ -343,30 +385,16 @@ def get_revenue(conn):
             SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-10') THEN monthly_total ELSE 0 END) AS Oct,
             SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-11') THEN monthly_total ELSE 0 END) AS Nov,
             SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-12') THEN monthly_total ELSE 0 END) AS `Dec`,
-            SUM(monthly_total) AS Total -- Calculate total revenue
+            SUM(monthly_total) AS Total
         FROM
             monthly_revenue
         GROUP BY
-            RoomCode, RoomName; -- Present results by room
+            RoomCode, RoomName;
     """
 
     # Execute the query and load results into a DataFrame
     df = pd.read_sql(sql_query, conn)
     print(df)
 
-def new_connection(user_name, password):
-    """
-    establishes a connection to the mysql database using the pre-specified username and password
-    or prints a warning if the connection could not be established
-    """
-
-    conn = mysql.connector.connect(user=user_name, password=password,
-                                   host='mysql.labthreesixfive.com',
-                                   database=user_name)
-    if conn.is_connected():
-        return conn
-    else:
-        print("Could not establish connection to MySQL database")
-        return None
 
 
