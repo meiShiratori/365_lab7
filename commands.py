@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import mysql.connector
 from commands_test import cursor
 
+
 def list_rooms(conn):
     sql_query = """
         WITH popularity AS (
@@ -358,6 +359,7 @@ def new_connection(user_name, password):
     establishes a connection to the mysql database using the pre-specified username and password
     or prints a warning if the connection could not be established
     """
+
     conn = mysql.connector.connect(user=user_name, password=password,
                                    host='mysql.labthreesixfive.com',
                                    database=user_name)
