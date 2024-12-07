@@ -1,5 +1,7 @@
 import pandas as pd
 from datetime import datetime, timedelta
+import mysql.connector
+from commands_test import cursor
 
 def list_rooms(conn):
     sql_query = """
@@ -74,10 +76,10 @@ def validate_date(date_str):
         return datetime.strptime(date_str, "%Y-%m-%d")
     except ValueError:
         return None
-        
+
 def reserve_input():
     first_name, last_name, room_code, bed_type, check_in, check_out, adults, kids = "","","","","","","",""
-    
+
     while first_name == "":
         first_name = input("First Name: ").upper().strip()
     while last_name == "":
@@ -119,7 +121,7 @@ def reserve_room(conn):
     if len(result) == 0:
         print("No suitable rooms available.")
         return
-    
+
     base_query = f"""
         WITH available_rooms AS (
             SELECT
@@ -171,7 +173,7 @@ def reserve_room(conn):
     if selected_index == "C" or selected_index == "Cancel":
         return
     selected_room = result[ int(selected_index)]
-    
+
     #print(selected_room)
 
     insert_query = """
@@ -180,7 +182,7 @@ def reserve_room(conn):
         VALUES 
             (UUID(), %s, %s, %s, %s, %s, %s, %s, %s)
     """
-    
+
     insert_args = [selected_room[0], check_in, check_out, calculate_total_cost(check_in, check_out, float(selected_room[5])), last_name, first_name, adults, kids]
     print(insert_args)
     cursor.execute(insert_query, insert_args)
@@ -200,7 +202,6 @@ def cancel_reservation(conn):
     conn.commit()
     print("Reservation successfully cancelled.")
 
-
 def calculate_total_cost(check_in, check_out, base_rate):
     check_in_date = datetime.strptime(check_in, "%Y-%m-%d")
     check_out_date = datetime.strptime(check_out, "%Y-%m-%d")
@@ -212,7 +213,7 @@ def calculate_total_cost(check_in, check_out, base_rate):
         current_day = check_in_date + timedelta(days=i)
         if current_day.weekday() < 5:
             weekdays += 1
-        else: 
+        else:
             weekends += 1
 
     weekday_cost = weekdays * base_rate
@@ -220,8 +221,14 @@ def calculate_total_cost(check_in, check_out, base_rate):
     return round(weekday_cost + weekend_cost, 2)
 
 def search(conn):
+    """
+    Prompts user for search parameters, with all parameters apart from date range being optional
+    Uses %s and pandas cursor to help prevent against sql injection
+    Returns reservation information containing room name, bed type, number of beds, room size, base price, and room decoration
+    """
+    # Collect user input for search criteria
     first_name = input("Enter first name:\n:> ").strip()
-    last_name = input("Enter last name :\n:> ").strip()
+    last_name = input("Enter last name:\n:> ").strip()
     checkin = input("Enter check-in date (YYYY-MM-DD):\n:> ").strip()
     while not checkin:
         print("Check-in cannot be blank\n")
@@ -233,6 +240,7 @@ def search(conn):
     reservation_code = input("Enter reservation code:\n:> ").strip()
     room_code = input("Enter room code:\n:> ").strip()
 
+    # Query with parameters for filtering
     sql_query = f"""
     SELECT 
         res.*,
@@ -245,23 +253,25 @@ def search(conn):
     FROM 
         hpena02.lab7_reservations res
     JOIN 
-        hpena02.lab7_rooms rooms ON res.Room = rooms.RoomCode
+        hpena02.lab7_rooms rooms ON res.Room = rooms.RoomCode -- Join reservations with rooms
     WHERE
-        (%s = '' OR res.FirstName LIKE %s)
+        (%s = '' OR res.FirstName LIKE %s) 
         AND (%s = '' OR res.LastName LIKE %s)
         AND (
-            (%s = '' AND %s = '')
+            (%s = '' AND %s = '') -- Python above ensures the user inputs a date range
             OR (res.CheckIn BETWEEN %s AND %s)
         )
         AND (%s = '' OR res.Room LIKE %s)
         AND (%s = '' OR res.CODE = %s);
     """
 
+    # Prepare parameters for SQL query
     cursor = conn.cursor()
     first_name_wildcard = f"%{first_name}%" if first_name else ""
     last_name_wildcard = f"%{last_name}%" if last_name else ""
     room_code_wildcard = f"%{room_code}%" if room_code else ""
 
+    # Map inputs to query parameters
     insert_args = [
         first_name, first_name_wildcard,
         last_name, last_name_wildcard,
@@ -269,13 +279,20 @@ def search(conn):
         room_code, room_code_wildcard,
         reservation_code, reservation_code
     ]
+
+    # Execute the query and fetch results
     cursor.execute(sql_query, insert_args)
     result = cursor.fetchall()
+    # Convert the result into a DataFrame
     result = pd.DataFrame(result, columns=[desc[0] for desc in cursor.description])
     conn.commit()
     print(result)
 
 def get_revenue(conn):
+    """
+    Generates a monthly and total revenue report for each room starting from the current date
+    """
+    # Query to calculate monthly and total revenue
     sql_query = """
         WITH RECURSIVE date_range AS (
             SELECT DATE_FORMAT(CURDATE(), '%Y-01-01') AS dt
@@ -288,7 +305,7 @@ def get_revenue(conn):
             SELECT
                 r.RoomCode,
                 r.RoomName,
-                DATE_FORMAT(d.dt, '%Y-%m') AS month,
+                DATE_FORMAT(d.dt, '%Y-%m') AS month, -- Extract month
                 ROUND(rsv.Rate, 0) AS daily_rate
             FROM
                 date_range d
@@ -299,7 +316,7 @@ def get_revenue(conn):
                 hpena02.lab7_rooms r 
                 ON r.RoomCode = rsv.Room
         ),
-        monthly_revenue AS (
+        monthly_revenue AS ( -- Summarise revenue by room and month
             SELECT
                 RoomCode,
                 RoomName,
@@ -325,13 +342,29 @@ def get_revenue(conn):
             SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-10') THEN monthly_total ELSE 0 END) AS Oct,
             SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-11') THEN monthly_total ELSE 0 END) AS Nov,
             SUM(CASE WHEN month = DATE_FORMAT(CURDATE(), '%Y-12') THEN monthly_total ELSE 0 END) AS `Dec`,
-            SUM(monthly_total) AS Total
+            SUM(monthly_total) AS Total -- Calculate total revenue
         FROM
             monthly_revenue
         GROUP BY
-            RoomCode, RoomName;
+            RoomCode, RoomName; -- Present results by room
     """
 
+    # Execute the query and load results into a DataFrame
     df = pd.read_sql(sql_query, conn)
     print(df)
+
+def new_connection(user_name, password):
+    """
+    establishes a connection to the mysql database using the pre-specified username and password
+    or prints a warning if the connection could not be established
+    """
+    conn = mysql.connector.connect(user=user_name, password=password,
+                                   host='mysql.labthreesixfive.com',
+                                   database=user_name)
+    if conn.is_connected():
+        return conn
+    else:
+        print("Could not establish connection to MySQL database")
+        return None
+
 
