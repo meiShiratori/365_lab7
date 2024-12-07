@@ -1,10 +1,14 @@
 Group Members:
-    Hahns Pena
-    Mei Shiratori
+    Hahns Pena (hpena02@calpoly.edu)
+    Mei Shiratori (tshirato@calpoly.edu)
 
  Runtime Instructions:
     Run from terminal using Python
         python3 main.py
+    Logging in, it will ask you for a user and password. We used our login credentials from lab threesixfive.
+    Here's mine in case you need it.
+        hpena02
+        365-fall24-028577009
     Commands
         [L]ist - List rooms
         [B]ook - Book a reservation
